@@ -1,6 +1,6 @@
 galaxy_info:
+  role_name: docker
   author: Robert Schmitz III
-  namespace: rgschmitz1
   description: Installs the latest version of docker (ce) and docker-compose
   license: BSD-3-Clause
   min_ansible_version: 2.13
