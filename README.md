@@ -12,7 +12,7 @@ See `defaults/main.yml` for a list of supported variables.
 
 ## Dependencies
 
-None.
+None
 
 ## Example Playbook
 
