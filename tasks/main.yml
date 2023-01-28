@@ -1,4 +1,10 @@
 ---
+- name: Install dependencies
+  ansible.builtin.apt:
+    pkg:
+      - gnupg
+    state: present
+
 - name: Create a keyrings directory if it does not exist
   ansible.builtin.file:
     path: /usr/share/keyrings/
@@ -7,7 +13,7 @@
 
 - name: Add GPG key
   ansible.builtin.get_url:
-    url: https://download.docker.com/linux/ubuntu/gpg
+    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
     dest: /usr/share/keyrings/docker.asc
     mode: '0644'
     force: true
@@ -18,7 +24,9 @@
 
 - name: Add docker repository
   ansible.builtin.apt_repository:
-    repo: "deb [arch={{ arch.stdout }} signed-by=/usr/share/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+    repo: "deb [arch={{ arch.stdout }} signed-by=/usr/share/keyrings/docker.asc] \
+           https://download.docker.com/linux/{{ ansible_distribution | lower }} \
+           {{ ansible_distribution_release }} stable"
     state: present
 
 - name: Install docker-ce and containerd
@@ -28,13 +36,14 @@
       - docker-ce-cli
       - containerd.io
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Adding ansible user to docker group
   ansible.builtin.user:
     name: "{{ ansible_user }}"
     groups: docker
-    append: yes
+    append: true
+  register: user_added_to_docker_group
 
 - name: Install docker-compose
   ansible.builtin.apt:
@@ -44,5 +53,5 @@
     cache_valid_time: 3600
   when: docker_install_compose | bool
 
-- name: Reset ssh connection to force groups update for user
-  ansible.builtin.meta: reset_connection
+- ansible.builtin.include_tasks: reset_connection.yml
+  when: user_added_to_docker_group.changed

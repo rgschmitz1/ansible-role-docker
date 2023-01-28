@@ -1,5 +1,6 @@
 galaxy_info:
   role_name: docker
+  namespace: rgschmitz1
   author: Robert Schmitz III
   description: Installs the latest version of docker (ce) and docker-compose
   license: BSD-3-Clause
