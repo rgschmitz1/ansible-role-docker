@@ -1,0 +1,41 @@
+---
+- name: Setting some facts
+  ansible.builtin.set_fact:
+    lc_dist: "{{ ansible_distribution | lower }}"
+    docker_gpg: /etc/apt/keyrings/docker.gpg
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    pkg:
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    cache_valid_time: 3600
+
+- name: Check if GPG key exits
+  ansible.builtin.stat:
+    path: "{{ docker_gpg }}"
+  register: gpg_key
+
+- name: Add GPG key if it does not exist
+  when: not gpg_key.stat.exists
+  block:
+    - name: Create a keyrings directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download/dearmor GPG key
+      ansible.builtin.shell:
+        cmd: "curl -fsSL https://download.docker.com/linux/{{ lc_dist }}/gpg \
+              | gpg --dearmor -o {{ docker_gpg }}"
+
+- name: Add repository source
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ architecture[ansible_architecture] }} signed-by={{ docker_gpg }}] \
+           https://download.docker.com/linux/{{ lc_dist }} \
+           {{ ansible_distribution_release }} stable"
+    state: present
+    update_cache: true

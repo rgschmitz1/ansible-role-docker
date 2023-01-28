@@ -1,2 +1,6 @@
 ---
+architecture:
+  "aarch64": "arm64"
+  "x86_64": "amd64"
 docker_install_compose: true
+docker_packages_state: present

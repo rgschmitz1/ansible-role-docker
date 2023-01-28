@@ -1,6 +1,6 @@
 # Ansible Role - Docker
 
-Installs docker and docker-compose on Linux.
+Installs docker-ce and docker-compose on Debian and Ubuntu distributions.
 
 ## Requirements
 
@@ -8,7 +8,12 @@ None
 
 ## Role Variables
 
-See `defaults/main.yml` for a list of supported variables.
+```
+# Must be one of: true, or false
+docker_install_compose: true
+# Must be one of: absent, latest, present
+docker_packages_state: present
+```
 
 ## Dependencies
 
@@ -19,7 +24,7 @@ None
 ```yaml
 ---
 - hosts: all
-  become: yes
+  become: true
   roles:
      - rgschmitz1.docker
 ```
